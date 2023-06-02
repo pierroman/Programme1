@@ -1,0 +1,395 @@
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+
+// Déclaration des variables
+char VilleH1[20];
+char LienH1[100];
+double CoordXH1;
+double CoordYH1;
+char VilleH2[20];
+char LienH2[100];
+double CoordXH2;
+double CoordYH2;
+char VilleD1[20];
+char LienD1[100];
+double CoordXD1;
+double CoordYD1;
+char VilleD2[20];
+char LienD2[100];
+double CoordXD2;
+double CoordYD2;
+char VilleA[20];
+double CoordXA;
+double CoordYA;
+char VilleB[20];
+double CoordXB;
+double CoordYB;
+int choix;
+
+// Fonction qui calcule le coefficient binomial
+long double binomial(int n, int k)
+{
+    long double c = 1;
+    int i;
+    // On utilise la propriété C(n,k) = C(n,n-k) pour réduire les calculs
+    if (k > n - k)
+        k = n - k;
+    // On utilise la formule récursive C(n,k) = C(n-1,k-1) * n / k
+    for (i = 0; i < k; i++)
+    {
+        c = c * (n - i);
+        c = c / (i + 1);
+    }
+    return c;
+}
+
+// Fonction qui calcule la probabilité hypergéométrique
+double hypergeom(int K, int N, int n, int k)
+{
+    // On utilise la fonction binomial définie précédemment
+    return (double)(binomial(K, k) * binomial(N - K, n - k) / binomial(N, n));
+}
+
+// Calcul des probabilités hypergéométriques
+int main()
+{
+    // On déclare les paramètres de la loi hypergéométrique
+    int K = 42108; // Nombre de succès dans la population
+    int N = 150388; // Nombre total d'éléments dans la population
+    int n = 10; // Taille de l'échantillon
+    int reponse_H; // Nombre de succès dans l'échantillon selon M. Hulot
+    int reponse_D; // Nombre de succès dans l'échantillon selon M. DoPaco
+
+    double resultat_H; // Probabilité hypergéométrique selon M. Hulot
+    double resultat_D; // Probabilité hypergéométrique selon M. DoPaco
+
+    printf("Selon vous sur une sélection au hasard de 10 espèces, combien d'espèces sont classées menacées ? Toutes les réponses de 0 à 10 sont possibles, cependant elles ne présentent pas les mêmes probabilités d’être vraies. Chaque probabilité est en lien avec une paire de villes françaises, une attrayante et l’autre beaucoup moins. Vous pourrez tous deux répondre à cette question, et celui obtenant la probabilité la plus élevée, ayant donc le plus de chances de s’approcher de la bonne réponse, aura le privilège de choisir, parmi les deux villes associées à sa réponse, dans laquelle il partira en vacances les 3 prochaines semaines ! Quant à celui ayant obtenu la probabilité la plus faible, il devra laisser le gagnant choisir, parmi les deux villes associées à la réponse du perdant, dans quelle ville il devra passer les 3 prochaines semaines.\n");
+
+    // On demande à l'utilisateur de saisir le nombre de succès souhaité par M. Hulot
+    printf("Nous allons commencer par M.Hulot. Selon vous sur une sélection au hasard de 10 espèces, combien d'espèces sont classées menacées ? ");
+
+    // On utilise une boucle while pour vérifier que l'entrée est valide
+    while (scanf("%d", &reponse_H) != 1 || reponse_H < 0 || reponse_H > n)
+    {
+        // On vide le buffer d'entrée pour éviter une boucle infinie
+        while (getchar() != '\n');
+        // On affiche un message d'erreur et on repose la question
+        printf("Erreur : vous devez entrer un entier entre 0 et %d\n", n);
+        printf("Nous allons commencer par M.Hulot. Selon vous sur une sélection au hasard de 10 espèces, combien d'espèces sont classées menacées ? ");
+    }
+
+    // On demande à l'utilisateur de saisir le nombre de succès souhaité par M. DoPaco
+    printf("Et vous, M. DoPaco ? Selon vous sur une sélection au hasard de 10 espèces, combien d'espèces sont classées menacées ? ");
+
+    // On utilise une boucle while pour vérifier que l'entrée est valide
+    while (scanf("%d", &reponse_D) != 1 || reponse_D < 0 || reponse_D > n || reponse_D == reponse_H) // On ajoute la condition reponse_D == reponse_H
+    {
+        // On vide le buffer d'entrée pour éviter une boucle infinie
+        while (getchar() != '\n');
+        // On affiche un message d'erreur et on repose la question
+        printf("Erreur : vous devez entrer un entier entre 0 et %d différent de la réponse de M. Hulot\n", n); // On modifie le message d'erreur
+        printf("Et vous, M. DoPaco ? Selon vous sur une sélection au hasard de 10 espèces, combien d'espèces sont classées menacées ? ");
+    }
+
+    // On calcule la probabilité hypergéométrique pour M. Hulot en utilisant la fonction hypergeom
+    resultat_H = hypergeom(K, N, n, reponse_H);
+
+    // On calcule la probabilité hypergéométrique pour M. DoPaco en utilisant la fonction hypergeom
+    resultat_D = hypergeom(K, N, n, reponse_D);
+
+    printf("En effet, Sur 150 388 espèces étudiées, 42 108 sont classées menacées. La probabilité d'avoir %d espèces menacées sur 10 étudiées est de %f et la probabilité d'avoir %d espèces menacées sur 10 étudiées est de %f\n", reponse_H, resultat_H, reponse_D, resultat_D);
+    
+    // Déclaration des tableaux contenant les informations sur les villes et les liens
+    char villes_H[11][2][30] = {
+        {"La Rochelle","Tourcoing"},
+        {"Cannes","Vitrolles"},
+        {"Bordeaux","Sarcelles"},
+        {"Paris","Roubaix"},
+        {"Nice","Maubeuge"},
+        {"Marseille","Beauvais"},
+        {"St-Malo","Charleville-mézières"},
+        {"Avignon","Troyes"},
+        {"Toulon","Calais"},
+        {"Nérac","Cessy"},
+        {"Saint-Agnant-prés-Crocq","Ablancourt"}
+
+    };
+
+    char liens_H[11][2][200] = {
+        {"la proportion de Rochelais de plus de 15ans exerçant les professions de commerçants, artisants ou chef d'entreprise.", "la proportion d'hommes Tourquennois ayant entre 75 et 80 ans"},
+        {"la proportion de Cannois ayant entre 15 et 30 ans en 2019","la proportion de Vitrollais ayant entre 15 et 30 ans en 2013"},
+        {"la proportion de familles bordelaises ayant 1 seul enfant","la proportion de Sarcellois ayant moins de 14 ans en 2019"},
+        {"la proportion de personnes de 40 à 54 ans vivants seuls à Paris en 2008","la proportion des habitants de Roubaix âgés de 0 à 14ans en 2019"},
+        {"la proportion de Niçoises ayant entre 45 et 60ans","la proportion des habitants de Maubeuge âgés de 30 à 44ans en 2013"},
+        {"la proportion de marseillais exerçant une profession intellectuelle supérieure en 2008","la proportion de Beauvaisiens habitant auparavant dans un autre logement de la même commune en 2019"},
+        {"le nombre moyens d'habitants par ménage Saint Malo en 1975","la proportion de carolomacériens âgés de 55 ans ou plus exerçant une profession intellectuelle supérieure en 2019"},
+        {"la variation relative anuelle entre 2012 et 2017","la variation relative anuelle entre 2012 et 2017"},
+        {"Pourcentag de Français habitant toulon entre 1841 et 1846","Pourcentage de français habitant Calais entre 1896 et 1901"},
+        {"Pourcentage de français habitant Nérac","Pourcentage de français habitant Cessyentre 2012 et 2017"},
+        {"Pourcentage de français habitant Saint-Agnant-prés-Crocq entre 2015 et aujourd'hui","Pourcentage de français habitant Ablancourt entre 1896 et 1901"}
+    };
+
+    double coords_H[11][4] = {
+        {379851.19,6570575.43,711381.49,7069690.74},
+        {1024233.63,6280716.61,882168.6,6263569.25},
+        {417235.59,6421797.63,654530.66,6877667.47},
+        {652515.7,6861994.05,712318.92,7066029.34},
+        {1044307.25,6297872.96,769024.47,7020676.08},
+        {892487.52,6246989.4,633418.66,6925914.84},
+        {330277.01,6850769.81,824001.25,6963689.52},
+        {844946.49,6318338.31,779712.97,6800228.61},
+        {938844.53,6228956.57,619335.36,7095729.04},
+        {487133.14,6340983,936161.67,6584262.71},
+        {650040.37,6521766.24,811726.4,6858328.64}
+    };
+
+     char villes_D[11][2][30] = {
+        {"La Rochelle","Turcoing"},
+        {"Cannes","Vitrolles"},
+        {"Bordeaux","Sarcelles"},
+        {"Paris","Roubaix"},
+        {"Nice","Maubeuge"},
+        {"Marseille","Beauvais"},
+        {"St-Malo","Charleville-mézières"},
+        {"Avignon","Troyes"},
+        {"Toulon","Calais"},
+        {"Nérac","Cessy"},
+        {"Saint-Agnant-prés-Crocq","Ablancourt"}
+    };
+    
+    char liens_D[11][2][200] = {
+        {"la proportion de Rochelais de plus de 15ans exerçant les professions de commerçants, artisants ou chef d'entreprise.", "la proportion d'hommes Tourquennois ayant entre 75 et 80 ans"},
+        {"la proportion de Cannois ayant entre 15 et 30 ans en 2019","la proportion de Vitrollais ayant entre 15 et 30 ans en 2013"},
+        {"la proportion de familles bordelaises ayant 1 seul enfant","la proportion de Sarcellois ayant moins de 14 ans en 2019"},
+        {"la proportion de personnes de 40 à 54 ans vivants seuls à Paris en 2008","la proportion des habitants de Roubaix âgés de 0 à 14ans en 2019"},
+        {"la proportion de Niçoises ayant entre 45 et 60ans","la proportion des habitants de Maubeuge âgés de 30 à 44ans en 2013"},
+        {"la proportion de marseillais exerçant une profession intellectuelle supérieure en 2008","la proportion de Beauvaisiens habitant auparavant dans un autre logement de la même commune en 2019"},
+        {"le nombre moyens d'habitants par ménage Saint Malo en 1975","la proportion de carolomacériens âgés de 55 ans ou plus exerçant une profession intellectuelle supérieure en 2019"},
+        {"la variation relative anuelle entre 2012 et 2017","la variation relative anuelle entre 2012 et 2017"},
+        {"Pourcentag de Français habitant toulon entre 1841 et 1846","Pourcentage de français habitant Calais entre 1896 et 1901"},
+        {"Pourcentage de français habitant Nérac","Pourcentage de français habitant Cessyentre 2012 et 2017"},
+        {"Pourcentage de français habitant Saint-Agnant-prés-Crocq entre 2015 et aujourd'hui","Pourcentage de français habitant Ablancourt entre 1896 et 1901"}
+    };
+
+    double coords_D[11][4] = {
+        {379851.19,6570575.43,711381.49,7069690.74},
+        {1024233.63,6280716.61,882168.6,6263569.25},
+        {417235.59,6421797.63,654530.66,6877667.47},
+        {652515.7,6861994.05,712318.92,7066029.34},
+        {1044307.25,6297872.96,769024.47,7020676.08},
+        {892487.52,6246989.4,633418.66,6925914.84},
+        {330277.01,6850769.81,824001.25,6963689.52},
+        {844946.49,6318338.31,779712.97,6800228.61},
+        {938844.53,6228956.57,619335.36,7095729.04},
+        {487133.14,6340983,936161.67,6584262.71},
+        {650040.37,6521766.24,811726.4,6858328.64}
+    };
+
+    // Déclaration d'une variable pour stocker l'indice du tableau correspondant au résultat
+   int indice = 0;
+
+   // Utilisation d'une boucle for pour parcourir les tableaux et affecter les valeurs aux variables
+    for (int indice = 0; indice < 11; indice++)
+   {
+       // On crée un tableau contenant les intervalles pour chaque indice
+       double intervalles[11][2] = {
+           {0.036,0.038},
+           {0.145,0.147},
+           {0.254,0.256},
+           {0.263,0.265},
+           {0.17,0.19},
+           {0.083,0.085},
+           {0.026,0.028},
+           {0.005,0.007},
+           {0.0007,0.0009},
+           {0.00006,0.00008},
+           {0.000002,0.000004}
+       };
+
+       // On teste si le résultat_H appartient à l'intervalle correspondant à l'indice du tableau
+       if (resultat_H >= intervalles[indice][0] && resultat_H <= intervalles[indice][1])
+       {
+           // On affecte les valeurs du tableau aux variables
+           strcpy(VilleH1, villes_H[indice][0]);
+           strcpy(LienH1, liens_H[indice][0]);
+           CoordXH1 = coords_H[indice][0];
+           CoordYH1 = coords_H[indice][1];
+           strcpy(VilleH2, villes_H[indice][1]);
+           strcpy(LienH2, liens_H[indice][1]);
+           CoordXH2 = coords_H[indice][2];
+           CoordYH2 = coords_H[indice][3];
+       }
+
+       // On teste si le résultat_D appartient à l'intervalle correspondant à l'indice du tableau
+       if (resultat_D >= intervalles[indice][0] && resultat_D <= intervalles[indice][1])
+       {
+           // On affecte les valeurs du tableau aux variables
+           strcpy(VilleD1, villes_D[indice][0]);
+           strcpy(LienD1, liens_D[indice][0]);
+           CoordXD1 = coords_D[indice][0];
+           CoordYD1 = coords_D[indice][1];
+           strcpy(VilleD2, villes_D[indice][1]);
+           strcpy(LienD2, liens_D[indice][1]);
+           CoordXD2 = coords_D[indice][2];
+           CoordYD2 = coords_D[indice][3];
+       }
+   }
+    
+    // Comparaison de resultat_H et resultat_D
+    if (resultat_H > resultat_D) {
+        // Affichage du message de victoire pour M. Hulot
+        printf("Bravo M. Hulot, vous avez gagné ! Figurez-vous que %.6f n'est pas que la probabilité d'obtenir %d espèces menacées sur 10 espèces étudiées au hasard, mais aussi %s ainsi que %s. Vous pouvez choisir si vous passerez vos 3 prochaines semaines à %s ou à %s\n", resultat_H, reponse_H, LienH1, LienH2, VilleH1, VilleH2);
+    
+        // Demande du choix de la ville pour M. Hulot
+        printf("Taper 1 si vous souhaitez partir à %s et 2 si vous souhaitez partir à %s\n", VilleH1, VilleH2);
+    
+        // Lecture du choix de l'utilisateur
+        scanf("%d", &choix);
+
+        // Vérification du choix de l'utilisateur
+        while (choix != 1 && choix != 2) {
+            // Affichage du message d'erreur
+            printf("Erreur: veuillez taper 1 ou 2\n");
+
+            // Lecture du choix de l'utilisateur
+            scanf("%d", &choix);
+        }
+    
+        // Enregistrement de la réponse de l'utilisateur dans la variable VilleA
+        if (choix == 1) {
+           strcpy(VilleA, VilleH1);
+            CoordXB=CoordXH1;
+            CoordYB=CoordYH1;
+        }
+        else {
+           strcpy(VilleA, VilleH2);
+            CoordXB=CoordXH2;
+            CoordYB=CoordYH2;
+        }
+    
+        // Affichage du message de défaite pour M. DoPaco
+        printf("Dommage M. DoPaco, vous avez perdu ☹. Figurez-vous que %.6f n'est pas que la probabilité d'obtenir %d espèces menacées sur 10 espèces étudiées au hasard, mais aussi %s ainsi que %s. Le vainqueur a le choix de la ville dans laquelle vous passerez les 3 prochaines semaines !\n", resultat_D, reponse_D, LienD1, LienD2);
+    
+        // Demande du choix de la ville pour M. DoPaco
+        printf("M. Hulot, dans quelle ville passera M. DoPaco ses 3 prochaines semaines ? Taper 1 si vous souhaitez que M. DoPaco parte à %s et 2 si vous souhaitez qu'il parte à %s\n", VilleD1, VilleD2);
+    
+        // Lecture du choix de l'utilisateur
+        scanf("%d", &choix);
+    
+        // Vérification du choix de l'utilisateur
+        while (choix != 1 && choix != 2) {
+            // Affichage du message d'erreur
+            printf("Erreur: veuillez taper 1 ou 2\n");
+    
+            // Lecture du choix de l'utilisateur
+            scanf("%d", &choix);
+        }
+    
+        // Enregistrement de la réponse de l'utilisateur dans la variable VilleB
+        if (choix == 1) {
+            strcpy(VilleB, VilleD1);
+            CoordXB=CoordXD1;
+            CoordYB=CoordYD1;
+        }
+        else {
+            strcpy(VilleB, VilleD2);
+            CoordXB=CoordXD2;
+            CoordYB=CoordYD2;
+        }
+        
+        // Déclaration + calcul de la distance
+        double distance = sqrt(pow(CoordXB-CoordXA,2)+pow(CoordYB-CoordYA,2))*0.001; // En kilomètres
+        
+        // Déclaration et calcul des variables pour les émissions de NOx
+        double Emissions_Voiture = distance * 57; // en mg
+        double Emissions_Avion = distance * 261; // en mg
+    
+        // Affichage du message à l'écran
+        printf("C’est donc décidé ! Monsieur Hulot, vous partirez donc à %s, et vous, M. DoPaco, vous partirez à %s.\n", VilleA, VilleB);
+        printf("Bonne vacances à tous les deux !\n");
+        printf("A la fin des 3 semaines, chacun passera 1 semaine de vacances en plus, mais dans la ville de l’autre. Pour faire le trajet entre ces deux villes vous serez amenés à parcourir %f km. Les Oxydes d’Azote (NOx) sont des polluants atmosphériques ayant des effets sur l’environnement et la santé. Le dioxyde d’azote (NO2) peut pénétrer dans les voies pulmonaires et provoquer des problèmes respiratoires chez les personnes sensibles, comme les enfants, les personnes âgées ou atteintes de pathologies (asthme…) . En outre, le NO2 contribue à la formation d’ozone, un autre polluant, lors de journées chaudes et ensoleillées . Les NOx favorisent également la formation de pluies acides et de particules fines dans l’air ambiant . Ils sont en majorité produits par les transports. C’est pour cette raison que vous devriez faire attention au mode de transport que vous allez employer durant votre voyage.\n", distance);
+        printf("Selon une étude scientifique réalisée par l’IFPEN et publiée par le gouvernement français, les émissions moyennes de NOx pour les véhicules diesel sont de 57 mg/km. Ce qui signifie qu’en parcourant %f km en voiture, vous produirez %f mg de NOx.\n", distance, Emissions_Voiture);
+        printf("Si vous comptiez faire votre trajet en avion, d’après le document transmis par Mme Higuera, vous produirez 261mg/km, soit un total de %f mg pour votre trajet total.\n", Emissions_Avion);
+        printf("(Les avions modernes consomment environ 3 litres de kérosène par passager aux 100 km lorsqu’ils sont pleins. 3 litres de kérosène équivalent à 2.4 kg de kérosène (3 * 0.8). En multipliant cela par 10.90 grammes de NOx par kilogramme de kérozène, on obtient environ 26.16 grammes de NOx pour 100 km parcourus par passager. Ainsi, la production de NOx par passager par kilomètre est d’environ 0.2616 grammes.)\n");
+        printf("C’est pour ces raisons que nous vous recommandons de choisir le train : ce mode de transport n’émet aucun oxyde d’azote, il est sur ce plan-là le moins impactant pour l’environnement, c’est la décision la plus rationnelle.\n");
+    }
+    else if (resultat_D > resultat_H) {
+        // Affichage du message de victoire pour M. DoPaco
+        printf("Bravo M. DoPaco, vous avez gagné ! Figurez-vous que %.6f n'est pas que la probabilité d'obtenir %d espèces menacées sur 10 espèces étudiées au hasard, mais aussi %s ainsi que %s. Vous pouvez choisir si vous passerez vos 3 prochaines semaines à %s ou à %s\n", resultat_D, reponse_D, LienD1, LienD2, VilleD1, VilleD2);
+    
+        // Demande du choix de la ville pour M. DoPaco
+        printf("Taper 1 si vous souhaitez partir à %s et 2 si vous souhaitez partir à %s\n", VilleD1,VilleD2);
+       
+            // Lecture du choix de l'utilisateur
+        scanf("%d", &choix);
+    
+            // Vérification du choix de l'utilisateur
+        while (choix != 1 && choix != 2) {
+            // Affichage du message d'erreur
+            printf("Erreur: veuillez taper 1 ou 2\n");
+    
+            // Lecture du choix de l'utilisateur
+            scanf("%d", &choix);
+        }
+    
+        // Enregistrement de la réponse de l'utilisateur dans la variable VilleA
+        if (choix == 1) {
+           strcpy(VilleA, VilleD1);
+            CoordXB=CoordXD1;
+            CoordYB=CoordYD1;
+        }
+        else {
+           strcpy(VilleA, VilleD2);
+            CoordXB=CoordXD2;
+            CoordYB=CoordYD2;
+        }
+    
+        // Affichage du message de défaite pour M. Hulot
+        printf("Dommage M. Hulot, vous avez perdu ☹. Figurez-vous que %.6f n'est pas que la probabilité d'obtenir %d espèces menacées sur 10 espèces étudiées au hasard, mais aussi %s ainsi que %s. Le vainqueur a le choix de la ville dans laquelle vous passerez les 3 prochaines semaines !\n", resultat_H, reponse_H, LienH1, LienH2);
+    
+        // Demande du choix de la ville pour M. Hulot
+        printf("M. DoPaco, dans quelle ville passera M. Hulot ses 3 prochaines semaines ? Taper 1 si vous souhaitez que M. Hulot parte à %s et 2 si vous souhaitez qu'il parte à %s\n", VilleH1, VilleH2);
+    
+        // Lecture du choix de l'utilisateur
+        scanf("%d", &choix);
+    
+        // Vérification du choix de l'utilisateur
+        while (choix != 1 && choix != 2) {
+            // Affichage du message d'erreur
+            printf("Erreur: veuillez taper 1 ou 2\n");
+    
+            // Lecture du choix de l'utilisateur
+            scanf("%d", &choix);
+        }
+    
+        // Enregistrement de la réponse de l'utilisateur dans la variable VilleB
+        if (choix == 1) {
+            strcpy(VilleB, VilleH1);
+            CoordXB=CoordXH1;
+            CoordYB=CoordYH1;
+        }
+        else {
+            strcpy(VilleB, VilleH2);
+            CoordXB=CoordXH2;
+            CoordYB=CoordYH2;
+        }
+        
+        // Déclaration + calcul de la distance
+        double distance = sqrt(pow(CoordXB-CoordXA,2)+pow(CoordYB-CoordYA,2))*0.001; // En kilomètres
+        
+        // Déclaration et calcul des variables pour les émissions de NOx
+        double Emissions_Voiture = distance * 57; // en mg
+        double Emissions_Avion = distance * 261; // en mg
+    
+        // Affichage du message à l'écran
+        printf("C’est donc décidé ! Monsieur Hulot, vous partirez donc à %s, et vous, M. DoPaco, vous partirez à %s.\n", VilleA, VilleB);
+        printf("Bonne vacances à tous les deux !\n");
+        printf("A la fin des 3 semaines, chacun passera 1 semaine de vacances en plus, mais dans la ville de l’autre. Pour faire le trajet entre ces deux villes vous serez amenés à parcourir %f km. Les Oxydes d’Azote (NOx) sont des polluants atmosphériques ayant des effets sur l’environnement et la santé. Le dioxyde d’azote (NO2) peut pénétrer dans les voies pulmonaires et provoquer des problèmes respiratoires chez les personnes sensibles, comme les enfants, les personnes âgées ou atteintes de pathologies (asthme…) . En outre, le NO2 contribue à la formation d’ozone, un autre polluant, lors de journées chaudes et ensoleillées . Les NOx favorisent également la formation de pluies acides et de particules fines dans l’air ambiant . Ils sont en majorité produits par les transports. C’est pour cette raison que vous devriez faire attention au mode de transport que vous allez employer durant votre voyage.\n", distance);
+        printf("Selon une étude scientifique réalisée par l’IFPEN et publiée par le gouvernement français, les émissions moyennes de NOx pour les véhicules diesel sont de 57 mg/km. Ce qui signifie qu’en parcourant %f km en voiture, vous produirez %f mg de NOx.\n", distance, Emissions_Voiture);
+        printf("Si vous comptiez faire votre trajet en avion, d’après le document transmis par Mme Higuera, vous produirez 261mg/km, soit un total de %f mg pour votre trajet total.\n", Emissions_Avion);
+        printf("(Les avions modernes consomment environ 3 litres de kérosène par passager aux 100 km lorsqu’ils sont pleins. 3 litres de kérosène équivalent à 2.4 kg de kérosène (3 * 0.8). En multipliant cela par 10.90 grammes de NOx par kilogramme de kérozène, on obtient environ 26.16 grammes de NOx pour 100 km parcourus par passager. Ainsi, la production de NOx par passager par kilomètre est d’environ 0.2616 grammes.)\n");
+        printf("C’est pour ces raisons que nous vous recommandons de choisir le train : ce mode de transport n’émet aucun oxyde d’azote, il est sur ce plan-là le moins impactant pour l’environnement, c’est la décision la plus rationnelle.\n");
+    }
+    return 0;
+}
